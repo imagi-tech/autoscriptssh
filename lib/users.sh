@@ -18,6 +18,7 @@ create_vpn_user() {
     local password="$2"
     local days="$3"
     local max_logins="${4:-2}"
+    local bw_limit_gb="${5:-0}"
     validate_username "$username" || return 3
     
     if [[ -z "$username" || -z "$password" || -z "$days" ]]; then
@@ -41,9 +42,10 @@ create_vpn_user() {
 
     # 2. Insert metadata to SQLite
     local uuid=$(uuidgen)
-    db_query "INSERT INTO users (username, uuid, expiry_date, max_logins) VALUES ('$username', '$uuid', '$exp_date', $max_logins);"
+    local data_limit_bytes=$((bw_limit_gb * 1073741824))
+    db_query "INSERT INTO users (username, uuid, expiry_date, max_logins, data_limit) VALUES ('$username', '$uuid', '$exp_date', $max_logins, $data_limit_bytes);"
     
-    log_event "INFO" "Successfully provisioned user: $username for $days days (Max Logins: $max_logins)."
+    log_event "INFO" "Successfully provisioned user: $username for $days days (Max Logins: $max_logins, Limit: ${bw_limit_gb}GB)."
     return 0
 }
 
@@ -51,7 +53,8 @@ create_trial_user() {
     local username="$1"
     local password="$2"
     local hours="$3"
-    local max_logins="${4:-2}" # <--- Catch the 4th argument
+    local max_logins="${4:-2}"
+    local bw_limit_gb="${5:-0}"
     validate_username "$username" || return 3
 
     if [[ -z "$username" || -z "$password" || -z "$hours" ]]; then
@@ -74,9 +77,10 @@ create_trial_user() {
 
     # Database Entry (Now includes max_logins)
     local uuid=$(uuidgen)
-    db_query "INSERT INTO users (username, uuid, expiry_date, max_logins) VALUES ('$username', '$uuid', '$exp_date', $max_logins);"
+    local data_limit_bytes=$((bw_limit_gb * 1073741824))
+    db_query "INSERT INTO users (username, uuid, expiry_date, max_logins, data_limit) VALUES ('$username', '$uuid', '$exp_date', $max_logins, $data_limit_bytes);"
     
-    log_event "INFO" "Successfully provisioned trial user: $username for $hours hours (Max Logins: $max_logins)."
+    log_event "INFO" "Successfully provisioned trial user: $username for $hours hours (Max Logins: $max_logins, Limit: ${bw_limit_gb}GB)."
     return 0
 }
 

@@ -13,14 +13,15 @@ TARGET="$3"
 ARG4="$4"
 ARG5="$5"
 ARG6="$6"
+ARG7="$7"
 
 show_help() {
     echo -e "\033[0;36mIMAGITECH CLI API\033[0m"
     echo "Usage: imagitech <resource> <action> [args]"
     echo ""
     echo "Commands:"
-    echo "  user add <user> <pass> <days>  - Create a new VPN account"
-    echo "  user trial <user> <pass> <hrs> - Create a trial account"
+    echo "  user add <user> <pass> <days> <max_logins> <bw_limit>  - Create a new VPN account"
+    echo "  user trial <user> <pass> <hrs> <max_logins> <bw_limit> - Create a trial account"
     echo "  user renew <user> <days>       - Add/deduct days from account"
     echo "  user del <user>                - Delete a VPN account"
     echo "  service restart <name>         - Restart a managed service"
@@ -40,8 +41,8 @@ show_help() {
 case "$COMMAND" in
     user)
         case "$SUBCOMMAND" in
-            add)   create_vpn_user "$TARGET" "$ARG4" "$ARG5" "$ARG6" ;;
-            trial) create_trial_user "$TARGET" "$ARG4" "$ARG5" "$ARG6" ;;
+            add)   create_vpn_user "$TARGET" "$ARG4" "$ARG5" "$ARG6" "$ARG7" ;;
+            trial) create_trial_user "$TARGET" "$ARG4" "$ARG5" "$ARG6" "$ARG7" ;;
             renew) renew_user "$TARGET" "$ARG4" ;;
             del)   delete_vpn_user "$TARGET" ;;
             *)     show_help ;;

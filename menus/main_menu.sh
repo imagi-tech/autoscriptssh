@@ -149,7 +149,10 @@ execute_add_user() {
         read -p "Max Simultaneous Logins (0 = Unlimited) [Default: 2]: " MAX_LOGINS
         MAX_LOGINS=${MAX_LOGINS:-2}
 
-        /opt/imagitech/bin/imagitech user add "$USERNAME" "$PASSWORD" "$DAYS" "$MAX_LOGINS" > /dev/null 2>&1
+        read -p "Bandwidth Limit in GB (0 = Unlimited) [Default: 0]: " BW_LIMIT
+        BW_LIMIT=${BW_LIMIT:-0}
+
+        /opt/imagitech/bin/imagitech user add "$USERNAME" "$PASSWORD" "$DAYS" "$MAX_LOGINS" "$BW_LIMIT" > /dev/null 2>&1
         API_STATUS=$?
         
         if [ $API_STATUS -eq 2 ]; then
@@ -161,7 +164,7 @@ execute_add_user() {
         fi
         break
     done
-    print_user_receipt "$USERNAME" "$PASSWORD" "$DAYS" "days" "$MAX_LOGINS"
+    print_user_receipt "$USERNAME" "$PASSWORD" "$DAYS" "days" "$MAX_LOGINS" "$BW_LIMIT"
 }
 
 execute_trial_user() {
@@ -181,8 +184,11 @@ execute_trial_user() {
     read -p "Max Simultaneous Logins (0 = Unlimited) [Default: 2]: " MAX_LOGINS
     MAX_LOGINS=${MAX_LOGINS:-2}
 
-    /opt/imagitech/bin/imagitech user trial "$USERNAME" "$PASSWORD" "$HOURS" "$MAX_LOGINS" > /dev/null 2>&1
-    print_user_receipt "$USERNAME" "$PASSWORD" "$HOURS" "hours" "$MAX_LOGINS"
+    read -p "Bandwidth Limit in GB (0 = Unlimited) [Default: 0]: " BW_LIMIT
+    BW_LIMIT=${BW_LIMIT:-0}
+
+    /opt/imagitech/bin/imagitech user trial "$USERNAME" "$PASSWORD" "$HOURS" "$MAX_LOGINS" "$BW_LIMIT" > /dev/null 2>&1
+    print_user_receipt "$USERNAME" "$PASSWORD" "$HOURS" "hours" "$MAX_LOGINS" "$BW_LIMIT"
 }
 
 execute_renew_user() {
@@ -448,6 +454,7 @@ print_user_receipt() {
     local TIME_VAL="$3"
     local TIME_TYPE="$4"
     local MAX_LOGINS="${5:-2}" 
+    local BW_LIMIT="${6:-0}"
     
     IP_ADDR=$(curl -sS ipv4.icanhazip.com)
     PUB_KEY=$(cat /opt/imagitech/core/keys/dnstt.pub 2>/dev/null || echo "Missing Key")
@@ -472,6 +479,9 @@ print_user_receipt() {
     local LOGIN_DISP="$MAX_LOGINS"
     if [ "$MAX_LOGINS" -eq 0 ]; then LOGIN_DISP="Unlimited"; fi
 
+    local BW_DISP="${BW_LIMIT} GB"
+    if [ "$BW_LIMIT" -eq 0 ]; then BW_DISP="Unlimited"; fi
+
     clear
     echo -e "${GREEN}${HEADER_MSG}${NC}"
     echo -e "Copy the details below to your clipboard:\n"
@@ -479,6 +489,8 @@ print_user_receipt() {
     echo -e "======== ACCOUNT DETAILS ========"
     echo -e "Username      : ${USERNAME}"
     echo -e "Password      : ${PASSWORD}"
+    echo -e "Limit         : ${LOGIN_DISP} Device(s)"
+    echo -e "Data Limit    : ${BW_DISP}"
     if [ "$TIME_TYPE" == "hours" ]; then
         echo -e "Duration      : ${TIME_VAL} hours"
     fi
@@ -647,6 +659,7 @@ menu_services() {
         echo -e "  ${CYAN}Dropbear          :${NC} 109, 143"
         echo -e "  ${CYAN}Stunnel4          :${NC} 447, 777"
         echo -e "  ${CYAN}SSH-WS (HTTP)     :${NC} 80"
+        echo -e "  ${CYAN}SSH-WSS (HTTPS)   :${NC} 443"
         echo -e "  ${CYAN}Custom SSH (HTTP) :${NC} 8880"
         echo -e "  ${CYAN}SlowDNS (DNSTT)   :${NC} 53, 5300"
         echo -e "  ${CYAN}UDP Custom        :${NC} 1-65535"
@@ -961,13 +974,14 @@ show_dashboard() {
         echo -e "  ${ORANGE}✦ Operating Sys${NC}   : ${CYAN}${OS_INFO}${NC}"
         echo -e "  ${ORANGE}✦ RAM / CPU Load${NC}  : ${GREEN}${RAM_USED}MB / ${RAM_TOTAL}MB${NC}  |  ${CYAN}${CPU_USAGE}${NC}"
         echo -e "  ${ORANGE}✦ Primary Domain${NC}  : ${GREEN}${PRIMARY_DOMAIN}${NC}"
-        echo -e "  ${ORANGE}✦ Data Used Today${NC} : ${GREEN}${BW_TODAY}${NC}  |  ${ORANGE}This Month${NC} : ${CYAN}${BW_MONTH}${NC}"
-        echo -e "  ${ORANGE}✦ Registered Users${NC}: ${GREEN}${ACTIVE_USERS} Active${NC}  |  ${RED}${EXPIRED_USERS} Expired${NC}  |  ${CYAN}${TOTAL_USERS} Total${NC}"
         draw_mid
         
         printf "  ${CYAN}WS-Proxy: %b   Stunnel : %b   Dropbear: %b${NC}\n" "$(check_service imagitech-ws)" "$(check_service stunnel4)" "$(check_service dropbear)"
         printf "  ${CYAN}Dante   : %b   UDP Cust: %b   DNSTT   : %b${NC}\n" "$(check_service danted)" "$(check_service imagitech-udp-custom)" "$(check_service imagitech-dnstt)"
         printf "  ${CYAN}Monitor : %b${NC}\n" "$(check_service imagitech-monitor)"
+        echo -e ""
+        echo -e "  ${ORANGE}Data Used Today${NC}   : ${GREEN}${BW_TODAY}${NC}"
+        echo -e "  ${ORANGE}Data Used Month${NC}   : ${CYAN}${BW_MONTH}${NC}"
         draw_mid
         
         echo -e "  Active Users : ${GREEN}${ACTIVE_USERS}${NC} / ${TOTAL_USERS}    Expired : ${RED}${EXPIRED_USERS}${NC}"

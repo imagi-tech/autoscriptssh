@@ -40,8 +40,16 @@ class ImagitechMonitor:
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
-            cursor.execute("SELECT username, max_logins, expiry_date FROM users WHERE status='ACTIVE'")
-            self.user_policies = {row[0]: {'max_logins': row[1], 'expiry': row[2]} for row in cursor.fetchall()}
+            cursor.execute("SELECT username, max_logins, expiry_date, data_usage, data_limit FROM users WHERE status='ACTIVE'")
+            self.user_policies = {
+                row[0]: {
+                    'max_logins': row[1], 
+                    'expiry': row[2],
+                    'data_usage': row[3] or 0,
+                    'data_limit': row[4] or 0
+                } 
+                for row in cursor.fetchall()
+            }
             conn.close()
         except Exception as e:
             self.log_event("ERROR", f"Database access failed: {e}")
@@ -138,6 +146,18 @@ class ImagitechMonitor:
                         del self.user_policies[user]
                 except Exception as e:
                     pass
+
+                # Enforce bandwidth limit
+                data_usage = policy.get('data_usage', 0)
+                data_limit = policy.get('data_limit', 0)
+                if data_limit > 0 and data_usage >= data_limit:
+                    self.log_event("WARN", f"Bandwidth limit exceeded: {user}. Locking account.")
+                    subprocess.run(["usermod", "-L", user], check=False, stderr=subprocess.DEVNULL)
+                    subprocess.run(["pkill", "-u", user], check=False, stderr=subprocess.DEVNULL)
+                    
+                    if not conn: conn = sqlite3.connect(self.db_path)
+                    conn.cursor().execute("UPDATE users SET status='LOCKED' WHERE username=?", (user,))
+                    conn.commit()
 
             for user, pids in self.active_sessions.items():
                 policy = self.user_policies.get(user)

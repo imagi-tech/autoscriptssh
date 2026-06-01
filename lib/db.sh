@@ -30,6 +30,11 @@ EOF
     if [[ -z "$col_exists" ]]; then
         sqlite3 "$DB_PATH" "ALTER TABLE users ADD COLUMN data_usage BIGINT DEFAULT 0;"
     fi
+
+    local limit_exists=$(sqlite3 "$DB_PATH" "PRAGMA table_info(users);" | grep "data_limit")
+    if [[ -z "$limit_exists" ]]; then
+        sqlite3 "$DB_PATH" "ALTER TABLE users ADD COLUMN data_limit BIGINT DEFAULT 0;"
+    fi
 }
 
 db_query() {
