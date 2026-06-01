@@ -20,6 +20,7 @@ class ImagitechMonitor:
         self.db_path = DB_PATH
         self.user_policies = {} 
         self.active_sessions = defaultdict(list)
+        self.pid_io_cache = {}
         self.setup_iptables()
 
     def log_event(self, level, msg):
@@ -69,29 +70,41 @@ class ImagitechMonitor:
             pass 
 
     def process_bandwidth(self):
-        conn = None
+        usage_updates = {}
+        current_pids = set()
+        
         try:
-            for user in self.user_policies.keys():
-                try:
-                    subprocess.run(f"iptables -C IMAGITECH-ACCT -m owner --uid-owner {user} -j RETURN", shell=True, check=True, stderr=subprocess.DEVNULL)
-                except subprocess.CalledProcessError:
-                    subprocess.run(f"iptables -A IMAGITECH-ACCT -m owner --uid-owner {user} -j RETURN", shell=True)
-
-            output = subprocess.check_output("iptables -L IMAGITECH-ACCT -n -v -x -Z", shell=True, text=True)
-            
-            usage_updates = {}
-            for line in output.strip().split('\n')[2:]:
-                parts = line.split()
-                if len(parts) >= 10 and 'owner' in parts and 'UID' in parts:
-                    bytes_used = int(parts[1])
-                    if bytes_used == 0: continue
-                    
-                    uid_str = parts[-1]
+            for user, pids in self.active_sessions.items():
+                for pid in pids:
+                    current_pids.add(pid)
+                    io_file = f"/proc/{pid}/io"
                     try:
-                        username = pwd.getpwuid(int(uid_str)).pw_name
-                        usage_updates[username] = bytes_used
-                    except KeyError:
-                        pass # User already reaped from OS
+                        with open(io_file, 'r') as f:
+                            rchar = 0
+                            wchar = 0
+                            for line in f:
+                                if line.startswith('rchar:'):
+                                    rchar = int(line.split()[1])
+                                elif line.startswith('wchar:'):
+                                    wchar = int(line.split()[1])
+                            
+                            current_total = rchar + wchar
+                            last_total = self.pid_io_cache.get(pid, 0)
+                            
+                            if current_total >= last_total:
+                                delta = current_total - last_total
+                            else:
+                                delta = current_total
+                                
+                            self.pid_io_cache[pid] = current_total
+                            
+                            if delta > 0:
+                                usage_updates[user] = usage_updates.get(user, 0) + delta
+                    except (FileNotFoundError, PermissionError, ValueError):
+                        pass
+
+            # Cleanup dead pids from cache
+            self.pid_io_cache = {pid: v for pid, v in self.pid_io_cache.items() if pid in current_pids}
 
             if usage_updates:
                 conn = sqlite3.connect(self.db_path)
@@ -99,11 +112,10 @@ class ImagitechMonitor:
                 for user, data_bytes in usage_updates.items():
                     cursor.execute("UPDATE users SET data_usage = data_usage + ? WHERE username = ?", (data_bytes, user))
                 conn.commit()
+                conn.close()
 
         except Exception as e:
             self.log_event("ERROR", f"Bandwidth tracking failed: {e}")
-        finally:
-            if conn: conn.close()
 
     def enforce_expiry_and_limits(self):
         now = datetime.datetime.now()
