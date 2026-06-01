@@ -8,7 +8,23 @@ log_event "INFO" "Deploying Multi-Login Enforcement Daemon..."
 # The master installer already placed the file here, just ensure it's executable
 chmod +x /opt/imagitech/services/monitor/daemon.py
 
-# 2. Stage the Systemd file to temp
+# 2. Stage CLI Utilities (Ookla Speedtest & Btop)
+if [ ! -x "/opt/imagitech/bin/speedtest" ]; then
+    run_with_spinner "Installing Ookla Speedtest..." wget -qO /tmp/speedtest.tgz https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-x86_64.tgz
+    tar -xzf /tmp/speedtest.tgz -C /opt/imagitech/bin speedtest
+    chmod +x /opt/imagitech/bin/speedtest
+fi
+
+if [ ! -x "/opt/imagitech/bin/btop" ]; then
+    run_with_spinner "Installing Btop Monitor..." wget -qO /tmp/btop.tbz https://github.com/aristocratos/btop/releases/download/v1.3.2/btop-x86_64-linux-musl.tbz
+    mkdir -p /tmp/btop
+    tar -xjf /tmp/btop.tbz -C /tmp/
+    mv /tmp/btop/bin/btop /opt/imagitech/bin/btop
+    chmod +x /opt/imagitech/bin/btop
+    rm -rf /tmp/btop /tmp/btop.tbz
+fi
+
+# 3. Stage the Systemd file to temp
 cat <<EOF > /tmp/imagitech-monitor.service.tmp
 
 [Unit]

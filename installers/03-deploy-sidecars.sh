@@ -72,11 +72,12 @@ Description=UDP Custom Proxy Server
 After=network.target
 
 [Service]
-Type=simple
 User=root
+Type=simple
 WorkingDirectory=/etc/udp-custom
-ExecStart=/opt/imagitech/bin/udp-custom server -c /etc/udp-custom/config.json -exclude 22,53,5300,80,443,109,143,447,777,1080
+ExecStart=/opt/imagitech/bin/udp-custom server -exclude 53,5300
 Restart=always
+RestartSec=3
 
 [Install]
 WantedBy=multi-user.target

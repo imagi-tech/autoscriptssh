@@ -738,7 +738,13 @@ menu_monitoring() {
                 pause ;;
             3) tail -n 50 /opt/imagitech/logs/imagitech.log; pause ;;
             4) grep "Failed password" /var/log/auth.log | tail -n 20; pause ;;
-            5) htop || top -n 1; pause ;;
+            5) 
+               if [ -x "/opt/imagitech/bin/btop" ]; then
+                   /opt/imagitech/bin/btop
+               else
+                   htop || top
+               fi
+               pause ;;
             0) return ;;
             *) echo -e "${RED}Invalid option${NC}"; sleep 1 ;;
         esac
@@ -799,11 +805,11 @@ menu_settings() {
             3) 
                clear
                echo -e "${CYAN}Initializing Server Speedtest...${NC}\n"
-               if ! command -v speedtest-cli &> /dev/null; then 
-                   echo -e "${ORANGE}Installing speedtest-cli...${NC}"
-                   apt-get install -y speedtest-cli >/dev/null 2>&1
+               if [ -x "/opt/imagitech/bin/speedtest" ]; then
+                   /opt/imagitech/bin/speedtest --accept-license --accept-gdpr
+               else
+                   echo -e "${RED}[!] Ookla Speedtest binary not found. Please re-run the installer.${NC}"
                fi
-               speedtest-cli --share
                pause ;;
             4) 
                 clear

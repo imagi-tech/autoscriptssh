@@ -16,12 +16,19 @@ safe_create_dir "/opt/imagitech/services/monitor"
 # 2. Idempotent Dependency Installation
 PACKAGES=(
     "curl" "wget" "git" "cron" "iptables" "lsof" "tar" "unzip" 
-    "uuid-runtime" "ca-certificates" "openssl" "sqlite3"
+    "uuid-runtime" "ca-certificates" "openssl" "sqlite3" "bzip2"
     "dropbear" "stunnel4" "dante-server" "python3"
 )
 
 log_event "INFO" "Verifying core dependencies..."
 DEBIAN_FRONTEND=noninteractive apt-get update -y > /dev/null 2>&1
+# Network Optimizations (TCP BBR)
+cat <<EOF > /etc/sysctl.d/99-imagitech-bbr.conf
+net.core.default_qdisc=fq
+net.ipv4.tcp_congestion_control=bbr
+net.ipv4.ip_forward=1
+EOF
+sysctl --system >/dev/null 2>&1
 for pkg in "${PACKAGES[@]}"; do
     ensure_package "$pkg"
 done
