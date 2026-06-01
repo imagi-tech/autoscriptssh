@@ -67,7 +67,7 @@ get_system_stats() {
         # Use default interface. vnstat --oneline returns semicolon-separated values
         # Field 6: Total Today, Field 11: Total Month
         local vn_data=$(vnstat --oneline 2>/dev/null)
-        if [[ "$vn_data" =~ ^[0-9]+; ]]; then
+        if [[ "$vn_data" =~ ^[0-9]+ ]]; then
             BW_TODAY=$(echo "$vn_data" | cut -d';' -f6)
             BW_MONTH=$(echo "$vn_data" | cut -d';' -f11)
         fi
