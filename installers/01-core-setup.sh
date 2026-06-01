@@ -44,7 +44,7 @@ if [ ! -f "$CONF_FILE" ]; then
     log_event "INFO" "Configuration file missing. Initiating interactive setup."
     
     read -p "Primary VPN Domain (e.g., vpn.imagitech.online): " DOMAIN
-    read -p "Nameserver Domain (e.g., ns-vpnimagitech.online): " NS_DOMAIN
+    read -p "Nameserver Domain (e.g., ns-vpn.imagitech.online): " NS_DOMAIN
     
     cat <<EOF > "$CONF_FILE"
 # IMAGITECH GLOBAL CONFIGURATION
