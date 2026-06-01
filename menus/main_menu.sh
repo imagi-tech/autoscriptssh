@@ -59,6 +59,19 @@ get_system_stats() {
     # New Static Geo Stats
     fetch_server_geo
     source /opt/imagitech/core/server_geo.env 2>/dev/null
+    
+    # Server Bandwidth Stats
+    BW_TODAY="0.00 MB"
+    BW_MONTH="0.00 MB"
+    if command -v vnstat &>/dev/null; then
+        # Use default interface. vnstat --oneline returns semicolon-separated values
+        # Field 6: Total Today, Field 11: Total Month
+        local vn_data=$(vnstat --oneline 2>/dev/null)
+        if [[ "$vn_data" =~ ^[0-9]+; ]]; then
+            BW_TODAY=$(echo "$vn_data" | cut -d';' -f6)
+            BW_MONTH=$(echo "$vn_data" | cut -d';' -f11)
+        fi
+    fi
 }
 
 get_db_stats() {
@@ -948,6 +961,8 @@ show_dashboard() {
         echo -e "  ${ORANGE}✦ Operating Sys${NC}   : ${CYAN}${OS_INFO}${NC}"
         echo -e "  ${ORANGE}✦ RAM / CPU Load${NC}  : ${GREEN}${RAM_USED}MB / ${RAM_TOTAL}MB${NC}  |  ${CYAN}${CPU_USAGE}${NC}"
         echo -e "  ${ORANGE}✦ Primary Domain${NC}  : ${GREEN}${PRIMARY_DOMAIN}${NC}"
+        echo -e "  ${ORANGE}✦ Data Used Today${NC} : ${GREEN}${BW_TODAY}${NC}  |  ${ORANGE}This Month${NC} : ${CYAN}${BW_MONTH}${NC}"
+        echo -e "  ${ORANGE}✦ Registered Users${NC}: ${GREEN}${ACTIVE_USERS} Active${NC}  |  ${RED}${EXPIRED_USERS} Expired${NC}  |  ${CYAN}${TOTAL_USERS} Total${NC}"
         draw_mid
         
         printf "  ${CYAN}WS-Proxy: %b   Stunnel : %b   Dropbear: %b${NC}\n" "$(check_service imagitech-ws)" "$(check_service stunnel4)" "$(check_service dropbear)"

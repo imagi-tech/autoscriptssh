@@ -63,7 +63,9 @@ create_trial_user() {
     local os_exp_date=$(date -d "+${hours} hours" +"%Y-%m-%d")
 
     # Native OS Account
-    useradd -M -s /bin/false -e "$os_exp_date" "$username" 2>/dev/null
+    # We do NOT use -e "$os_exp_date" here because if the trial expires today, Linux PAM locks it immediately.
+    # Our Python daemon (daemon.py) will precisely enforce the hour/minute expiry anyway.
+    useradd -M -s /bin/false "$username" 2>/dev/null
     if [ $? -ne 0 ]; then
         log_event "ERROR" "Failed to create OS user: $username. User may already exist."
         return 2

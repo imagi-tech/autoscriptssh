@@ -17,7 +17,7 @@ safe_create_dir "/opt/imagitech/services/monitor"
 PACKAGES=(
     "curl" "wget" "git" "cron" "iptables" "lsof" "tar" "unzip" 
     "uuid-runtime" "ca-certificates" "openssl" "sqlite3" "bzip2"
-    "dropbear" "stunnel4" "dante-server" "python3"
+    "dropbear" "stunnel4" "dante-server" "python3" "vnstat"
 )
 
 log_event "INFO" "Verifying core dependencies..."
