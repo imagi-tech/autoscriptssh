@@ -906,9 +906,16 @@ menu_backup_restore() {
                 echo -e "${CYAN}=== RESTORE SYSTEM BACKUP ===${NC}"
                 local backup_dir="/opt/imagitech/backups"
                 
-                # Check if directory exists and is not empty
-                if [ ! -d "$backup_dir" ] || [ -z "$(ls -A "$backup_dir" 2>/dev/null)" ]; then
+                # Ensure directory exists and is writable for SFTP uploads
+                if [ ! -d "$backup_dir" ]; then
+                    mkdir -p "$backup_dir"
+                    chmod 777 "$backup_dir"
+                fi
+                
+                # Check if directory is empty
+                if [ -z "$(ls -A "$backup_dir" 2>/dev/null)" ]; then
                     echo -e "\n${ORANGE}[!] No backups found in $backup_dir.${NC}"
+                    echo -e "${CYAN}Tip: Upload your .tar.gz.enc backup file to this folder via SFTP.${NC}"
                     pause
                     continue
                 fi
