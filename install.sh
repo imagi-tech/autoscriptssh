@@ -7,7 +7,7 @@
 # ⚠️ CRITICAL: Ensure your GitHub repository structure matches
 # the new /opt/imagitech/ architecture we built!
 # ==========================================================
-REPO_URL="https://raw.githubusercontent.com/dexteree11/autoscriptssh/main"
+REPO_URL="https://raw.githubusercontent.com/imagi-tech/autoscriptssh/main"
 
 # --- UI Colors ---
 GREEN='\033[0;32m'

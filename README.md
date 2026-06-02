@@ -1,50 +1,57 @@
-# Imagitech Enterprise Deployment Pipeline
+<div align="center">
+  <h1>🚀 IMAGITECH ENTERPRISE DEPLOYMENT PIPELINE</h1>
+  <p><b>An automated, highly-resilient, and elite VPN & SSH orchestration engine built for modern VPS infrastructure.</b></p>
+</div>
 
-An automated, idempotent, and highly secure VPN & SSH tunneling orchestration script built for modern VPS infrastructure. This platform provisions a multi-protocol proxy environment complete with real-time monitoring, bandwidth tracking, anti-DDoS features, and a dynamic CLI dashboard.
+---
 
-## 🚀 Features
+Imagitech Provisions a multi-protocol proxy environment complete with real-time tracking, aggressive bandwidth enforcement, multi-login prevention, anti-DDoS features, and a dynamic CLI dashboard. 
 
-### Core Protocols & Tunnels
-- **OpenSSH & Dropbear:** Multi-port SSH tunneling (Ports 22, 109, 143).
-- **Stunnel4 (SSL/TLS):** Encrypted tunneling bridging (Ports 447, 777).
-- **Asynchronous WebSocket Proxy:** High-performance, async WS multiplexer supporting HTTP Injection and ISP Bypassing on ports 80, 443, and 8880.
+Built exclusively for **Ubuntu (20.04, 22.04, 24.04)** and **Debian (11, 12)** LTS to guarantee 100% stability.
+
+## 🌟 Elite Features
+
+### 🔌 Next-Gen Tunneling & Routing
+- **OpenSSH & Dropbear:** Multi-port SSH tunneling (Ports 22, 109, 143, 8880).
+- **Stunnel4 (SSL/TLS):** Encrypted TLS bridging and SNI routing (Ports 443, 447, 777).
+- **Asynchronous WebSocket Proxy:** High-performance async WS multiplexer supporting HTTP Injection and ISP Bypassing on ports 80, 443, and 8880.
 - **UDP Custom:** High-performance direct UDP tunneling for intensive gaming/voice packets (Ports 1-65535).
 - **DNSTT (SlowDNS):** Advanced payload encapsulation through DNS queries for deeply restricted networks (Ports 53, 5300).
-- **Dante SOCKS5 Proxy:** Standalone SOCKS proxy (Port 1080).
+- **Dante SOCKS5 Proxy:** Standalone, high-speed SOCKS5 proxy (Port 1080).
 
-### Security & Monitoring
-- **Real-time Session Monitoring:** Python daemon tracks active SSH/WS logins to strictly enforce concurrent multi-login limits.
-- **Fail2Ban Integration:** Configured out-of-the-box to drop bots and prevent SSH brute force attacks.
-- **Bandwidth Accounting:** Granular byte tracking using low-level IPTables hooks integrated into an SQLite3 database.
-- **OS Reaper:** Automatically deletes Linux accounts and kills active sessions exactly when a user's subscription expires.
-- **Encrypted Backups:** AES-256-CBC powered backups for databases, TLS certificates, and DNS keys.
+### 🛡️ Security & Active Monitoring
+- **Python-Powered Active Monitor:** A resilient Python background daemon (`daemon.py`) tracks active logins in real-time, strictly enforcing maximum concurrent logins.
+- **Bandwidth Limits & Accounting:** Granular byte tracking using low-level `/proc/io` data, securely logged to an SQLite3 database. Enforces strict GB limits on accounts.
+- **The OS Reaper:** Automatically eradicates Linux accounts and instantly drops connections the exact second a user's subscription expires.
+- **Military-Grade Backups:** Uses AES-256-CBC with PBKDF2 to encrypt your database, TLS certificates, and DNS keys. Seamless SFTP disaster recovery.
+- **TCP KeepAlives:** Enforced kernel-level heartbeats prevent Cloudflare and Azure from silently dropping idle connections.
 
-## 📦 Installation
+## 📦 Zero-Touch Installation
 
-To deploy the platform on a fresh Ubuntu/Debian server, run the following as `root`:
+To deploy the platform on a fresh Ubuntu or Debian server, run the following command as `root`:
 
 ```bash
 apt-get update -y && apt-get install -y curl wget
-bash <(curl -sS -L https://raw.githubusercontent.com/dexteree11/autoscriptssh/main/install.sh)
+bash <(curl -sS -L https://raw.githubusercontent.com/imagi-tech/autoscriptssh/main/install.sh)
 ```
 
-## 🛠️ Usage
+## 🛠️ Operations & Usage
 
-Once the installation is complete, you can access the platform in two ways:
+Once the installation completes, manage your server securely:
 
-1. **Interactive Dashboard:** Type `menu` to launch the comprehensive TUI panel for managing users, monitoring connections, and modifying system settings.
-2. **Headless API:** Type `imagitech` followed by an API command for automation and scripting.
-   - Example: `imagitech user add test 12345 30` (Create user 'test' with pass '12345' for 30 days)
+1. **Interactive Dashboard:** Type `menu` to launch the beautiful and comprehensive TUI panel for managing users, monitoring connections, and modifying system settings.
+2. **Headless Internal API:** Type `imagitech` followed by an API command to script automations natively.
+   - Example: `imagitech user add test 12345 30 2 10` (Create user 'test', pass '12345', 30 days, 2 devices, 10GB Limit)
    - Example: `imagitech service restart all`
 
-## 📂 Architecture
+## 📂 System Architecture
 
-The system avoids cluttering your global namespace. All configurations, binaries, and databases are strictly sandboxed inside `/opt/imagitech/`.
+The script strictly adheres to modern Linux engineering principles. It avoids polluting your global namespace; all configurations, python daemons, and databases are strictly sandboxed.
 
 - `/opt/imagitech/core/`: SQLite3 Databases, SSL certificates, DNSTT public/private keys.
-- `/opt/imagitech/services/`: Python daemons (Monitor, Async Routing Proxy).
-- `/opt/imagitech/lib/`: Core bash modules (system, users, database).
-- `/opt/imagitech/logs/`: Managed logs with built-in rotation.
+- `/opt/imagitech/services/`: Python engine (`daemon.py`) and Async Routing Proxy (`ws-proxy.py`).
+- `/opt/imagitech/lib/`: Core bash logic modules.
+- `/opt/imagitech/backups/`: Location for encrypted snapshots and disaster recovery via SFTP.
 
 ## ⚠️ Disclaimer
-This script is intended for educational purposes, privacy enhancement, and network administration. Abuse of this service for spam, DDoS, or illegal torrenting is strictly prohibited. Use responsibly.
+This software is intended for educational purposes, privacy enhancement, and legal network administration. Abuse of this service for spam, DDoS, or illegal operations is strictly prohibited. The developer takes no responsibility for misuse.

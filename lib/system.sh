@@ -208,7 +208,7 @@ uninstall_script() {
 
 # Move this OUTSIDE to prevent nested function errors
 safe_fetch() {
-    local repo_url="https://raw.githubusercontent.com/dexteree11/autoscriptssh/main"
+    local repo_url="https://raw.githubusercontent.com/imagi-tech/autoscriptssh/main"
     local file_path="$1"
     local target_path="$2"
     local tmp_dir="/tmp/imagitech_update"
