@@ -914,8 +914,8 @@ menu_backup_restore() {
                 fi
 
                 echo -e "Available Archives:\n"
-                # Read all tar.gz files into an array, sorted by newest first
-                mapfile -t BACKUP_LIST < <(ls -1t "$backup_dir"/*.tar.gz 2>/dev/null)
+                # Read all encrypted backup files into an array, sorted by newest first
+                mapfile -t BACKUP_LIST < <(ls -1t "$backup_dir"/*.tar.gz.enc 2>/dev/null)
 
                 local i=1
                 for b_file in "${BACKUP_LIST[@]}"; do
