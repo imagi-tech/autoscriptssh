@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>🚀 IMAGITECH ENTERPRISE DEPLOYMENT PIPELINE</h1>
+  <h1>🚀 IMAGITECH AUTOSCRIPT - COMMUNITY EDITION</h1>
   <p><b>An automated, highly-resilient, and elite VPN & SSH orchestration engine built for modern VPS infrastructure.</b></p>
 </div>
 
