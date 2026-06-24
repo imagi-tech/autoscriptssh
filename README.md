@@ -31,7 +31,10 @@ Built exclusively for **Ubuntu (20.04, 22.04, 24.04)** and **Debian (11, 12)** L
 To deploy the platform on a fresh Ubuntu or Debian server, run the following command as `root`:
 
 ```bash
-apt-get update -y && apt-get install -y curl wget
+apt update && apt upgrade -y
+```
+
+```bash
 bash <(curl -sS -L https://raw.githubusercontent.com/imagi-tech/autoscriptssh/main/install.sh)
 ```
 
@@ -40,6 +43,11 @@ bash <(curl -sS -L https://raw.githubusercontent.com/imagi-tech/autoscriptssh/ma
 Once the installation completes, manage your server securely:
 
 1. **Interactive Dashboard:** Type `menu` to launch the beautiful and comprehensive TUI panel for managing users, monitoring connections, and modifying system settings.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/84a494f4-7f92-4c77-bd8d-31398cf2978d" alt="Dashboard & Menus" width="300">
+</p>
+   
 2. **Headless Internal API:** Type `imagitech` followed by an API command to script automations natively.
    - Example: `imagitech user add test 12345 30 2 10` (Create user 'test', pass '12345', 30 days, 2 devices, 10GB Limit)
    - Example: `imagitech service restart all`
@@ -55,3 +63,12 @@ The script strictly adheres to modern Linux engineering principles. It avoids po
 
 ## ⚠️ Disclaimer
 This software is intended for educational purposes, privacy enhancement, and legal network administration. Abuse of this service for spam, DDoS, or illegal operations is strictly prohibited. The developer takes no responsibility for misuse.
+
+
+<div align="center">
+  <p>
+    <b>Subscribe</b> → <a href="https://t.me/imagivpnbot">@imagivpnbot</a><br>
+    <b>Channel</b> → <a href="https://t.me/imagitech001">@imagitech001</a><br>
+    <b>Developer</b> → <a href="https://t.me/DR34_M3R">†hε drεαmεr</a>
+  </p>
+</div>
